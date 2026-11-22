@@ -12,7 +12,18 @@ export function read<T>(name: string, fallback: T): T {
   try {
     return JSON.parse(fs.readFileSync(path.join(root, name), "utf8"));
   } catch (e: any) {
-    if (e.code === "ENOENT") return fallback;
+    if (e.code === "ENOENT") {
+      if (name === "champion.json" || name.startsWith("champions/")) {
+        try {
+          return JSON.parse(
+            fs.readFileSync(path.resolve("strategies", name), "utf8"),
+          );
+        } catch (err: any) {
+          if (err.code !== "ENOENT") throw err;
+        }
+      }
+      return fallback;
+    }
     throw e;
   }
 }

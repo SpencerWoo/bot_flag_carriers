@@ -58,7 +58,9 @@ export function checkTransition(
           ? after.lastAction.combat.att.rank
           : after.lastAction?.combat && p.pos === (a.to || a.target)
             ? after.lastAction.combat.def.rank
-            : "5";
+            : after.lastAction?.victim && p.pos === a.target
+              ? after.lastAction.victim.rank
+              : "5";
   g.flagsLast = { R: "R", B: "B", Y: "Y", G: "G" };
   g.histories = {};
   g.chases = {};

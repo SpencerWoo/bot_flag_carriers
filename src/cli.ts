@@ -1,6 +1,7 @@
 import { installSignals } from "./control.js";
 installSignals();
 import fs from "node:fs";
+import { exportResults } from "./export.js";
 import { validate } from "./validate.js";
 import { Client } from "./api.js";
 import { DEFAULT } from "./strategy.js";
@@ -77,7 +78,8 @@ try {
       minutes: num("minutes", 120),
       maxActions: num("max-actions", Infinity),
     });
-  } else if (command === "validate")
+  } else if (command === "export") console.log(JSON.stringify(exportResults()));
+  else if (command === "validate")
     console.log(JSON.stringify(validate(), null, 2));
   else if (command === "report") console.log(report());
   else if (command === "replay") {
@@ -99,7 +101,7 @@ try {
     console.log("Initialized champion V0");
   } else
     console.log(
-      "Commands: init | auth [--check] | match [--mode 3|4 --seed N] | replay | evaluate --candidate FILE [--games 600 --seed N] | learn [--minutes 120 --live-games 4 --rounds N] | live [--kind offline|test|friendly --mode 3|4 --id ID --minutes 120] | validate | report",
+      "Commands: init | auth [--check] | match [--mode 3|4 --seed N] | replay | evaluate --candidate FILE [--games 600 --seed N] | learn [--minutes 120 --live-games 4 --rounds N] | live [--kind offline|test|friendly --mode 3|4 --id ID --minutes 120] | validate | export | report",
     );
 } catch (e: any) {
   console.error(e.message);

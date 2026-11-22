@@ -114,3 +114,63 @@ test("rate limiting stops live submissions after one rejection", async () => {
   assert.equal(submissions, 1);
   assert.equal(read("pending.json", "missing"), null);
 });
+test("server errors also preserve uncertain submissions without retry", async () => {
+  const g = view(initial(3, 1), "R");
+  g.id = "abc";
+  g.offline = true;
+  save("pending.json", null);
+  save("parity-gate.json", { passed: true });
+  let submissions = 0;
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    if (url.endsWith("/api/me"))
+      return response({ user: { nickname: "test" } });
+    if (url.includes("/api/events")) return new Response("");
+    if (url.endsWith("/action")) {
+      submissions++;
+      return response({ error: "Internal failure" }, 500);
+    }
+    if (url.endsWith("/api/games/abc")) return response(g);
+    throw Error("Unexpected test request");
+  };
+  await assert.rejects(
+    () => play({ id: "abc", minutes: 1, maxActions: 1 }),
+    /Submission outcome uncertain/,
+  );
+  assert.equal(submissions, 1);
+  assert(read<any>("pending.json", null)?.action);
+});
+test("public export excludes session data and live game identifiers", async () => {
+  const { exportResults } = await import("../src/export.js");
+  const { append } = await import("../src/storage.js");
+  const { DEFAULT } = await import("../src/strategy.js");
+  save("champion.json", { version: 0, weights: DEFAULT });
+  append("live-results.jsonl", {
+    id: "private-game-123",
+    mode: 3,
+    finished: true,
+    results: { R: "W" },
+  });
+  save("checkpoint-private-game-123.json", { mySeats: ["R"] });
+  const destination = fs.mkdtempSync(
+      path.join(os.tmpdir(), "flag-export-test-"),
+    ),
+    previous = process.cwd();
+  try {
+    process.chdir(destination);
+    exportResults();
+    const text = fs.readFileSync("results/summary.json", "utf8");
+    assert(!text.includes("private-game-123"));
+    assert(!text.includes("fake"));
+    assert(!text.includes("test@example.invalid"));
+    const summary = JSON.parse(text);
+    assert.equal(summary.live["3"].wins, 1);
+    assert.equal(
+      JSON.parse(fs.readFileSync("strategies/champion.json", "utf8")).version,
+      0,
+    );
+  } finally {
+    process.chdir(previous);
+    fs.rmSync(destination, { recursive: true, force: true });
+  }
+});

@@ -7,12 +7,19 @@ export function validate() {
   const failure = read<any>("parity-failure.json", null);
   if (failure?.before && failure?.action && failure?.after)
     traces.push(failure);
+  if (failure?.game) errors.push(...checkGeometry(failure.game));
   for (const t of traces) {
     const key = String(t.before.mode);
     coverage[key] ??= { geometry: 0, transitions: 0, types: {} };
     const geom = checkGeometry(t.before);
     errors.push(...geom);
-    if (!geom.length) coverage[key].geometry++;
+    if (
+      !geom.length &&
+      t.before.status === "playing" &&
+      !t.before.promoWait &&
+      t.before.mySeats.includes(t.before.turn)
+    )
+      coverage[key].geometry++;
     const tr = checkTransition(t.before, t.action, t.after);
     errors.push(...tr.errors);
     if (tr.checked && !tr.errors.length) {

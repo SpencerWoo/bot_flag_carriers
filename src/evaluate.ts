@@ -249,10 +249,13 @@ async function learnLocked(
 ) {
   const start = Date.now(),
     deadline = start + minutes * 60000;
+  const localDeadline =
+    deadline -
+    (liveGames > 0 ? Math.min(30 * 60000, minutes * 60000 * 0.25) : 0);
   let round = 0;
   if (!Number.isFinite(minutes) || minutes <= 0)
     throw Error("Positive minutes required");
-  while (!stopping && Date.now() < deadline && round < roundLimit) {
+  while (!stopping && Date.now() < localDeadline && round < roundLimit) {
     const champion = read<any>("champion.json", {
       version: 0,
       weights: DEFAULT,
@@ -278,7 +281,7 @@ async function learnLocked(
     let best: any = null;
     for (
       let i = 0;
-      i < candidates.length && !stopping && Date.now() < deadline;
+      i < candidates.length && !stopping && Date.now() < localDeadline;
       i++
     ) {
       const r = await evaluate(
@@ -286,7 +289,7 @@ async function learnLocked(
         12,
         (start % 10000000) + round * 1000,
         true,
-        deadline,
+        localDeadline,
       );
       if (r.complete && (!best || r.overall.mean > best.overall.mean)) best = r;
     }
@@ -296,13 +299,13 @@ async function learnLocked(
       finalist: best?.candidate,
       deadline,
     });
-    if (!best || stopping || Date.now() >= deadline) break;
+    if (!best || stopping || Date.now() >= localDeadline) break;
     const holdout = await evaluate(
       best.candidate,
       600,
       100000000 + (start % 10000000) + round * 1000,
       false,
-      deadline,
+      localDeadline,
     );
     const gate = read<any>("parity-gate.json", { passed: false });
     // Public-client geometry checks do not establish full server parity.

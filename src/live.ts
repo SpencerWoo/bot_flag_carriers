@@ -39,6 +39,16 @@ export async function play(options: LiveOptions = {}) {
   }
 }
 async function playLocked(options: LiveOptions) {
+  if (
+    options.minutes !== undefined &&
+    (!Number.isFinite(options.minutes) || options.minutes <= 0)
+  )
+    throw Error("Positive minutes required");
+  const parity = read<any>("parity-gate.json", {});
+  if (parity.passed === false)
+    throw Error(
+      "Parity validation is paused; run validate after correcting the recorded failure",
+    );
   const client = new Client();
   const me = await client.me();
   if (!me.user)
@@ -56,16 +66,15 @@ async function playLocked(options: LiveOptions) {
   let g: Game = await client.game(id),
     mem: Memory = read("memory-" + id + ".json", newMemory());
   const pending = read<any>("pending.json", null);
+  if (pending && pending.id !== id)
+    throw Error(
+      "Another game has an uncertain submission; resolve its checkpoint before switching games",
+    );
   if (pending && pending.id === id && pending.fingerprint === fingerprint(g))
     throw Error(
       "Uncertain previous submission: server state is unchanged. Inspect pending.json before clearing; no action was retried.",
     );
   save("pending.json", null);
-  const parity = read<any>("parity-gate.json", {});
-  if (parity.passed === false)
-    throw Error(
-      "Parity validation is paused; run validate after correcting the recorded failure",
-    );
   const end = Date.now() + 60000 * (options.minutes ?? 120),
     w = options.weights || read("champion.json", { weights: DEFAULT }).weights;
   let count = 0,
@@ -107,7 +116,7 @@ async function playLocked(options: LiveOptions) {
     try {
       next = await client.act(id, a);
     } catch (e) {
-      if (e instanceof ApiError && e.status >= 400) {
+      if (e instanceof ApiError && e.status >= 400 && e.status < 500) {
         save("pending.json", null);
         errors++;
         if (errors >= 3 || [401, 403, 429].includes(e.status)) throw e;
@@ -222,7 +231,7 @@ async function playLocked(options: LiveOptions) {
     geometry: (gate.coverage[g.mode]?.geometry || 0) + geometryChecks,
     transitions: (gate.coverage[g.mode]?.transitions || 0) + transitionChecks,
   };
-  gate.fullParity = false;
+  gate.fullParity ??= false;
   gate.testMode = "admin-only";
   save("parity-gate.json", gate);
   if (g.status === "finished") {

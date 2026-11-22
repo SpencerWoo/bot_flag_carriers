@@ -1,0 +1,497 @@
+{
+  "updated": "2026-11-22T11:50:52.209Z",
+  "championVersion": 0,
+  "live": {
+    "3": {
+      "games": 1,
+      "wins": 1,
+      "draws": 0,
+      "losses": 0
+    },
+    "4": {
+      "games": 1,
+      "wins": 0,
+      "draws": 0,
+      "losses": 1
+    }
+  },
+  "validation": {
+    "passed": true,
+    "fullParity": false,
+    "coverage": {
+      "3": {
+        "geometry": 14,
+        "transitions": 14,
+        "types": {
+          "move": 14
+        }
+      },
+      "4": {
+        "geometry": 37,
+        "transitions": 38,
+        "types": {
+          "move": 37,
+          "recruit": 1
+        }
+      }
+    },
+    "reason": "Partial observation checks only. Test-game access is administrator-only; repetition/chasing and all hidden-state transitions remain uncertified."
+  },
+  "decisionLatencyP95Ms": 38.803750999999465,
+  "evaluations": [
+    {
+      "id": "1795347079946-7055018",
+      "seed": 7055018,
+      "requestedPairs": 12,
+      "completedPairs": 12,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 5.708198381914519,
+        "risk": 8.813420912942831,
+        "flag": 3.5701468259001414,
+        "advance": 0.48543622657655044,
+        "novelty": 2.724106017024091,
+        "artillery": 1.5491036080172942,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 12,
+        "mean": -0.08333333333333333,
+        "lower": -0.7899369791341447,
+        "upper": 0.623270312467478,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 6,
+          "mean": -0.16666666666666666,
+          "lower": -1,
+          "upper": 0.8326217924471154,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 6,
+          "mean": 0,
+          "lower": -0.9992884591137821,
+          "upper": 0.9992884591137821,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.08333333333333333,
+      "championWinRate": 0.16666666666666666,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:31:19.946Z"
+    },
+    {
+      "id": "1795347099060-7055018",
+      "seed": 7055018,
+      "requestedPairs": 12,
+      "completedPairs": 12,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 4.0812978620177915,
+        "risk": 8.61231863391002,
+        "flag": 2.7588801776224505,
+        "advance": 0.8618160037270811,
+        "novelty": 2.84539063804006,
+        "artillery": 1.0660393425441703,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 12,
+        "mean": -0.08333333333333333,
+        "lower": -0.7899369791341447,
+        "upper": 0.623270312467478,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 6,
+          "mean": 0,
+          "lower": -0.9992884591137821,
+          "upper": 0.9992884591137821,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 6,
+          "mean": -0.16666666666666666,
+          "lower": -1,
+          "upper": 0.8326217924471154,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.08333333333333333,
+      "championWinRate": 0.16666666666666666,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:31:39.061Z"
+    },
+    {
+      "id": "1795347118864-7055018",
+      "seed": 7055018,
+      "requestedPairs": 12,
+      "completedPairs": 12,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 5.565515446251229,
+        "risk": 10.583728830591069,
+        "flag": 3.448174186637031,
+        "advance": 0.7540049816514128,
+        "novelty": 1.325756921205988,
+        "artillery": 1.7498555307682855,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 12,
+        "mean": -0.08333333333333333,
+        "lower": -0.7899369791341447,
+        "upper": 0.623270312467478,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 6,
+          "mean": 0,
+          "lower": -0.9992884591137821,
+          "upper": 0.9992884591137821,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 6,
+          "mean": -0.16666666666666666,
+          "lower": -1,
+          "upper": 0.8326217924471154,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.08333333333333333,
+      "championWinRate": 0.16666666666666666,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:31:58.864Z"
+    },
+    {
+      "id": "1795347143825-7055018",
+      "seed": 7055018,
+      "requestedPairs": 12,
+      "completedPairs": 12,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 8.514612749427362,
+        "risk": 7.824535392749481,
+        "flag": 2.926664323875025,
+        "advance": 0.4701890458921625,
+        "novelty": 2.2141128482921735,
+        "artillery": 1.1817886033539475,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 12,
+        "mean": -0.08333333333333333,
+        "lower": -0.7899369791341447,
+        "upper": 0.623270312467478,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 6,
+          "mean": -0.16666666666666666,
+          "lower": -1,
+          "upper": 0.8326217924471154,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 6,
+          "mean": 0,
+          "lower": -0.9992884591137821,
+          "upper": 0.9992884591137821,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.08333333333333333,
+      "championWinRate": 0.16666666666666666,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:32:23.825Z"
+    },
+    {
+      "id": "1795347163998-7055018",
+      "seed": 7055018,
+      "requestedPairs": 12,
+      "completedPairs": 12,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 6.800256196835658,
+        "risk": 6.21112292350384,
+        "flag": 7.242684159995423,
+        "advance": 0.3432185639250714,
+        "novelty": 1.5783677833859306,
+        "artillery": 1.4193192048522414,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 12,
+        "mean": 0.08333333333333333,
+        "lower": -0.623270312467478,
+        "upper": 0.7899369791341447,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 6,
+          "mean": 0,
+          "lower": -0.9992884591137821,
+          "upper": 0.9992884591137821,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 6,
+          "mean": 0.16666666666666666,
+          "lower": -0.8326217924471154,
+          "upper": 1,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.25,
+      "championWinRate": 0.16666666666666666,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:32:43.998Z"
+    },
+    {
+      "id": "1795347186472-7055018",
+      "seed": 7055018,
+      "requestedPairs": 12,
+      "completedPairs": 12,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 3.782442464846639,
+        "risk": 6.979611246849882,
+        "flag": 5.039423678746271,
+        "advance": 0.9107458867508476,
+        "novelty": 1.8146845232154254,
+        "artillery": 1.0612392408239741,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 12,
+        "mean": 0.08333333333333333,
+        "lower": -0.623270312467478,
+        "upper": 0.7899369791341447,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 6,
+          "mean": 0,
+          "lower": -0.9992884591137821,
+          "upper": 0.9992884591137821,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 6,
+          "mean": 0.16666666666666666,
+          "lower": -0.8326217924471154,
+          "upper": 1,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.25,
+      "championWinRate": 0.16666666666666666,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:33:06.472Z"
+    },
+    {
+      "id": "1795347237273-103",
+      "sourceHash": "1a342af87260dc941800762280a04b2727fdc714c28e43952722dd792d8c9374",
+      "seed": 103,
+      "requestedPairs": 4,
+      "completedPairs": 4,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 5,
+        "risk": 7,
+        "flag": 5,
+        "advance": 0.6,
+        "novelty": 1.8,
+        "artillery": 1,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 4,
+        "mean": 0,
+        "lower": -1,
+        "upper": 1,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 2,
+          "mean": 0,
+          "lower": -1,
+          "upper": 1,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 2,
+          "mean": 0,
+          "lower": -1,
+          "upper": 1,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.25,
+      "championWinRate": 0.25,
+      "eligible": false,
+      "screen": true,
+      "time": "2026-11-22T11:33:57.273Z"
+    },
+    {
+      "id": "1795347275683-107055018",
+      "seed": 107055018,
+      "requestedPairs": 600,
+      "completedPairs": 50,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 6.800256196835658,
+        "risk": 6.21112292350384,
+        "flag": 7.242684159995423,
+        "advance": 0.3432185639250714,
+        "novelty": 1.5783677833859306,
+        "artillery": 1.4193192048522414,
+        "carrier": "10"
+      },
+      "complete": false,
+      "overall": {
+        "n": 50,
+        "mean": -0.02,
+        "lower": -0.36616367652045706,
+        "upper": 0.326163676520457,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 25,
+          "mean": -0.08,
+          "lower": -0.5695493661361632,
+          "upper": 0.4095493661361633,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 25,
+          "mean": 0.04,
+          "lower": -0.4495493661361633,
+          "upper": 0.5295493661361633,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.26,
+      "championWinRate": 0.28,
+      "eligible": false,
+      "screen": false,
+      "time": "2026-11-22T11:34:35.683Z"
+    },
+    {
+      "id": "1795347451606-22026000",
+      "sourceHash": "1a342af87260dc941800762280a04b2727fdc714c28e43952722dd792d8c9374",
+      "seed": 22026000,
+      "requestedPairs": 600,
+      "completedPairs": 86,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 6.800256196835658,
+        "risk": 6.21112292350384,
+        "flag": 7.242684159995423,
+        "advance": 0.3432185639250714,
+        "novelty": 1.5783677833859306,
+        "artillery": 1.4193192048522414,
+        "carrier": "10"
+      },
+      "complete": false,
+      "overall": {
+        "n": 86,
+        "mean": 0.023255813953488372,
+        "lower": -0.2406915148987513,
+        "upper": 0.287203142805728,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 43,
+          "mean": 0.046511627906976744,
+          "lower": -0.3267662643080119,
+          "upper": 0.41978952012196535,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 43,
+          "mean": 0,
+          "lower": -0.37327789221498864,
+          "upper": 0.37327789221498864,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.27906976744186046,
+      "championWinRate": 0.2558139534883721,
+      "eligible": false,
+      "screen": false,
+      "time": "2026-11-22T11:37:31.607Z"
+    },
+    {
+      "id": "1795347561596-33026000",
+      "sourceHash": "5cdac4424c95a21340678aaf0e9ece36117889f36587c89e505871faf32509d5",
+      "runtime": "v24.15.0",
+      "seed": 33026000,
+      "requestedPairs": 600,
+      "completedPairs": 600,
+      "championVersion": 0,
+      "candidate": {
+        "capture": 6.800256196835658,
+        "risk": 6.21112292350384,
+        "flag": 7.242684159995423,
+        "advance": 0.3432185639250714,
+        "novelty": 1.5783677833859306,
+        "artillery": 1.4193192048522414,
+        "carrier": "10"
+      },
+      "complete": true,
+      "overall": {
+        "n": 600,
+        "mean": 0.03,
+        "lower": -0.06992884591137821,
+        "upper": 0.1299288459113782,
+        "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+      },
+      "byMode": {
+        "3": {
+          "n": 300,
+          "mean": 0.05,
+          "lower": -0.09132072916016228,
+          "upper": 0.1913207291601623,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        },
+        "4": {
+          "n": 300,
+          "mean": 0.01,
+          "lower": -0.13132072916016227,
+          "upper": 0.1513207291601623,
+          "method": "one-sided 95% Hoeffding bound for paired outcomes in [-1,1]"
+        }
+      },
+      "candidateWinRate": 0.31,
+      "championWinRate": 0.28,
+      "eligible": false,
+      "screen": false,
+      "time": "2026-11-22T11:49:42.592Z"
+    }
+  ]
+}

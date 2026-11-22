@@ -223,3 +223,40 @@ test("reinforcement wait pauses clocks and expires after thirty seconds", async 
   assert.equal(g.promoWait, null);
   assert.equal(g.clock.left.R, 600000);
 });
+test("chase repetitions are blocked except immediate retreat", () => {
+  const g = sparse([
+    p("x", "R", "5", "5,3"),
+    p("b", "B", "5", "5,5"),
+    p("y", "Y", "5", "7,14"),
+    p("g", "G", "5", "13,8"),
+  ]);
+  g.chases.R = { piece: "x", target: "b", seen: ["5,4|5,5"] };
+  g.histories.R = { piece: "x", edges: {}, previous: "5,2" };
+  assert(!simActions(g).x.moves.includes("5,4"));
+  g.histories.R.previous = "5,4";
+  g.ver++;
+  assert(simActions(g).x.moves.includes("5,4"));
+});
+test("artillery can shoot across a lake into the bunker ring", () => {
+  const b = board(4),
+    q = p("x", "R", "C", "6,4"),
+    v = p("v", "B", "10", "RING"),
+    occ: any = { [q.pos]: q, [v.pos]: v };
+  assert(b.lake("6,5"));
+  assert(targets(b, occ, {}, q.pos).includes("RING"));
+});
+test("candidate inputs reject unknown fields and invalid numeric weights", async () => {
+  const { validateWeights, DEFAULT } = await import("../src/strategy.js");
+  assert.throws(
+    () => validateWeights({ ...DEFAULT, password: "must-not-publish" }),
+    /Unknown candidate field/,
+  );
+  assert.throws(
+    () => validateWeights({ ...DEFAULT, risk: NaN }),
+    /Invalid candidate weight/,
+  );
+  assert.throws(
+    () => validateWeights({ ...DEFAULT, carrier: "999" }),
+    /Invalid carrier/,
+  );
+});

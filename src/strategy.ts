@@ -33,6 +33,17 @@ export function validateWeights(value: unknown): Weights {
   if (!value || typeof value !== "object")
     throw Error("Candidate must be an object");
   const w = value as Weights;
+  const keys = [
+    "capture",
+    "risk",
+    "flag",
+    "advance",
+    "novelty",
+    "artillery",
+    "carrier",
+  ];
+  if (Object.keys(value).some((k) => !keys.includes(k)))
+    throw Error("Unknown candidate field");
   for (const key of [
     "capture",
     "risk",

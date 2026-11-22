@@ -11,6 +11,7 @@ A reproducible local strategy league and an authenticated player for [Flag Carri
 ./bot validate
 ./bot learn --minutes 120 --live-games 4
 ./bot report
+./bot export
 ```
 
 `./bot` uses Node.js 24+ when installed, otherwise downloads Node 24.15.0 from nodejs.org and verifies its SHA-256. `./bot setup` installs locked dependencies and builds TypeScript. Set `FLAG_CARRIERS_NODE` to use a particular Node executable. Linux and macOS on x64 and arm64 are supported by the bootstrap.
@@ -38,11 +39,11 @@ A learning round screens six challengers on 12 paired scenarios each, then evalu
 
 Promotion requires complete games, a positive one-sided 95% Hoeffding lower bound on paired win-rate improvement, no statistically significant regression on either board, and certified simulator parity. The bound is conservative and supports differences in [-1, 1]; repeated learning runs do not constitute a simultaneous lifetime guarantee. A sample of better-looking wins is insufficient for promotion. Draws count as non-wins. Unfinished or interrupted evaluations cannot promote a strategy.
 
-Champion versions, parent versions, seeds, policy/engine fingerprints, paired results, and promotion decisions are saved. Historical champions are retained for rollback and inspection. Candidates and failed evaluations are also retained. An unchanged champion is a valid outcome.
+Champion versions, parent versions, seeds, policy/engine fingerprints, paired results, and promotion decisions are saved. Historical champions are retained for rollback and inspection. Candidates and failed evaluations are also retained. An unchanged champion is a valid outcome. `./bot export` writes the champion, its history, and aggregate evaluation results into `strategies/` and `results/` for committing to Git. It omits credentials, account names, game identifiers, and private traces. A fresh clone reads the exported champion when no runtime champion exists.
 
 ## Live play and recovery
 
-The website calls its unranked bot mode **Offline**; it still runs on the live website. This is the default. `--kind friendly` explicitly creates a human lobby; `--id GAME_ID` resumes a particular game. Ranked games and teams are rejected. One live game runs at a time, enforced by a process lock. The learning command starts at most four live bot games, and defaults to a two-hour total budget.
+The website calls its unranked bot mode **Offline**; it still runs on the live website. This is the default. `--kind friendly` explicitly creates a human lobby; `--id GAME_ID` resumes a particular game. Ranked games and teams are rejected. One live game runs at a time, enforced by a process lock. The learning command starts at most four live bot games, and defaults to a two-hour total budget. It reserves 25% of that budget (up to 30 minutes) for live evaluation.
 
 The runner handles setup, moves, artillery, and reinforcement choices. Decisions have a two-second policy budget. It uses the event stream when available, with polling as a fallback. Decisions are based on refreshed state; move submissions are never blindly retried after a lost response. Every accepted action is checkpointed, and SIGINT/SIGTERM requests a clean stop at the next action boundary.
 
