@@ -1,6 +1,6 @@
 # Flag Carriers Master league
 
-One GPT-6.2 Astra researcher develops strategies for the three- and four-player Flag Carriers boards. It starts from the current **Master**, proposes one change, and plays it against Master. A separate referee decides promotions. [Master leaderboard](league/leaderboard.md) · [Website results](results/live-by-master.md) · [First research session](results/master-g0-research.md)
+One GPT-6.2 Astra researcher develops strategies for the three- and four-player Flag Carriers boards. It starts from the current **Master**, proposes one change, and plays it against Master. A separate referee decides promotions. [Master leaderboard](league/leaderboard.md) · [Website results](results/live-by-master.md) · [First research session](results/master-g0-research.md) · [First solo session](results/solo-research.md)
 
 ```sh
 ./bot setup
