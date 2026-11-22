@@ -15,3 +15,5 @@ All three qualified for the referee queue. Promotion requires an independent 2,4
 On this host, 24 reference games took 14.853 CPU seconds with the original engine and 5.570 with the optimized engine, a 2.67× speedup. Throughput increased from 286 to 762 plies per CPU second. Both produced the same actions and winners across all 4,246 plies. The combined trajectory SHA-256 was `ca3e0f174a417fc79403bfc1a0702dc72f66a670aa93ab939b17c2265c657267`.
 
 The comparison used Node 24.15.0 and the original engine at `f62a7e6f952a5225061172f5038f25d21ac9c448`. Four warmups used seeds 99000–99003. Measured seeds 12700–12723 alternated three- and four-player boards with rotating test seats and the original heuristic roster. The arena also has a separate mirrored-pair benchmark runnable with `./bot benchmark --pairs 12`. [Trajectory regression tests](../test/arena-match.test.ts)
+
+From this repository, run `node --import tsx scripts/reference-benchmark.mjs /path/to/checkout` for each revision, using `.` for the current checkout.

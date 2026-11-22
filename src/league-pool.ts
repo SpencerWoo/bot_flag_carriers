@@ -23,6 +23,7 @@ interface Options {
   signal?: AbortSignal;
 }
 interface Task {
+  initialRetries?: number;
   job: LeaguePairJob;
   options: Options;
   resolve: (r: Result) => void;
@@ -55,6 +56,7 @@ export class LeaguePool {
   private dir = fs.mkdtempSync(path.join(os.tmpdir(), "flag-referee-"));
   private files = new Map<string, { stamp: string; dest: string }>();
   private children = new Map<number, ChildProcess>();
+  private completed = new WeakMap<ChildProcess, number>();
   private idle = new Set<number>();
   private tasks: Record<Priority, Task[]> = {
     development: [],
@@ -180,14 +182,28 @@ export class LeaguePool {
       child?.removeListener("message", reply);
       child?.removeListener("exit", exit);
       child?.removeListener("error", fail);
-      if (error && child) {
+      const completed = child ? (this.completed.get(child) ?? 0) + 1 : 0;
+      if (child) this.completed.set(child, completed);
+      // Recycle V8 realms between complete pairs. This bounds retained memory
+      // across long qualifications without resetting any player during play.
+      if (child && (error || completed >= 64)) {
         this.children.delete(slot);
         child.kill("SIGKILL");
       }
       this.active.delete(slot);
       this.idle.add(slot);
       lock.close(() => {
-        if (error) task.reject(error);
+        const retryInitialization =
+          error &&
+          /Script execution timed out after 1500ms/.test(error.message) &&
+          !task.initialRetries &&
+          !this.stopped &&
+          !task.options.signal?.aborted &&
+          Date.now() < task.options.deadline;
+        if (retryInitialization) {
+          task.initialRetries = 1;
+          this.tasks[task.options.priority].unshift(task);
+        } else if (error) task.reject(error);
         else task.resolve(result!);
         this.pump();
       });

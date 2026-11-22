@@ -42,7 +42,7 @@ function options(directory: string) {
   };
 }
 
-test("each independent theory retains its artifact, parent, and feedback", async () => {
+test("only one researcher runs and retains its artifact, parent, and feedback", async () => {
   const directory = makeDirectory(),
     opts = options(directory),
     submissions: ResearchProposal[] = [];
@@ -53,9 +53,12 @@ test("each independent theory retains its artifact, parent, and feedback", async
         submissions.push(p);
       },
     });
-    assert.equal(result.length, 3);
-    assert.equal(submissions.length, 3);
-    assert.equal(new Set(submissions.map((p) => p.file)).size, 3);
+    assert.deepEqual(
+      result.map((r) => r.agent),
+      ["carrier"],
+    );
+    assert.equal(submissions.length, 1);
+
     for (const p of submissions) {
       assert.equal(p.parent, master.hash);
       assert.equal(fs.readFileSync(p.file, "utf8"), p.source);
@@ -68,7 +71,7 @@ test("each independent theory retains its artifact, parent, and feedback", async
         return opts.generate(job);
       },
     });
-    assert.equal(feedback.length, 3);
+    assert.equal(feedback.length, 1);
     assert(feedback.every((x) => x.includes("+3 of 12 seed pairs")));
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
@@ -104,7 +107,7 @@ test("interrupted researchers reuse their completed model outputs at resume", as
         accepted++;
       },
     });
-    assert.equal(accepted, 3);
+    assert.equal(accepted, 1);
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -118,20 +121,21 @@ test("Master advance invalidates the pending development result", async () => {
     await runResearchers({
       ...opts,
       master: () =>
-        ++calls <= 3 ? master : { ...master, generation: 1, hash: "g1" },
+        ++calls === 1 ? master : { ...master, generation: 1, hash: "g1" },
       screen: async () => {
         screened++;
         return { qualified: true, summary: "unused" };
       },
     });
     assert.equal(screened, 0);
-    for (const a of ["carrier", "inference", "threats"]) {
-      const s = JSON.parse(
-        fs.readFileSync(path.join(directory, a, "1", "state.json"), "utf8"),
-      );
-      assert.equal(s.stage, "stale");
-      assert.equal(s.parent, "g0");
-    }
+    const state = JSON.parse(
+      fs.readFileSync(
+        path.join(directory, "carrier", "1", "state.json"),
+        "utf8",
+      ),
+    );
+    assert.equal(state.stage, "stale");
+    assert.equal(state.parent, "g0");
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
@@ -190,9 +194,41 @@ test("an uncertain enqueue resumes the qualified artifact without rescreening", 
         submissions++;
       },
     });
-    assert.equal(generations, 3);
-    assert.equal(screens, 3);
-    assert.equal(submissions, 3);
+    assert.equal(generations, 1);
+    assert.equal(screens, 1);
+    assert.equal(submissions, 1);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("the solo researcher uses the promoted Master and the referee's verdict on its next proposal", async () => {
+  const directory = makeDirectory();
+  const opts = options(directory);
+  let latest = master;
+  const parents: string[] = [],
+    feedback: string[] = [];
+  try {
+    const researchers = await runResearchers({
+      ...opts,
+      maxIterations: 2,
+      master: () => latest,
+      generate: async (job) => {
+        parents.push(job.master.hash);
+        feedback.push(job.feedback);
+        return opts.generate(job);
+      },
+      submit: async () => {
+        latest = { ...master, generation: 1, hash: "new-master" };
+        return { feedback: "Fresh qualification passed in 2,400 games." };
+      },
+    });
+    assert.equal(researchers.length, 1);
+    assert.equal(researchers[0].attempts, 2);
+    assert.deepEqual(parents, ["g0", "new-master"]);
+    assert.match(feedback[1], /Fresh qualification passed in 2,400 games/);
+    assert(!fs.existsSync(path.join(directory, "inference")));
+    assert(!fs.existsSync(path.join(directory, "threats")));
   } finally {
     fs.rmSync(directory, { recursive: true, force: true });
   }
