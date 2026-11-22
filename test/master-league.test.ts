@@ -55,8 +55,6 @@ function fixture(t: test.TestContext) {
   process.env.FLAG_CARRIERS_LEAGUE_REPO = home;
   process.env.FLAG_CARRIERS_LEAGUE_DATA = path.join(dir, "private");
   for (const filename of [
-    "league/master.json",
-    "league/history.json",
     "policies/master-g0.mjs",
     "league/policies/runner.mjs",
     "league/policies/aggressive.mjs",
@@ -64,6 +62,16 @@ function fixture(t: test.TestContext) {
     fs.mkdirSync(path.dirname(path.join(home, filename)), { recursive: true });
     fs.copyFileSync(path.join(repo, filename), path.join(home, filename));
   }
+  // Each isolated league starts at the immutable G0, even when the live league advances.
+  const [g0] = JSON.parse(
+    fs.readFileSync(path.join(repo, "league/history.json"), "utf8"),
+  );
+  assert.equal(g0.generation, 0);
+  fs.writeFileSync(path.join(home, "league/master.json"), JSON.stringify(g0));
+  fs.writeFileSync(
+    path.join(home, "league/history.json"),
+    JSON.stringify([g0]),
+  );
   git(["add", "."]);
   git([
     "-c",
