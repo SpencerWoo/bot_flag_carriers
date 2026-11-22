@@ -1,7 +1,8 @@
 # Flag Carriers Master leaderboard
 
-Master G0 runs the original V0 heuristic. Each promotion adds the policy, its paired results against its predecessor and its score against the fixed G0 field. [Initial results](../results/README.md) · [Live games by Master generation](../results/live-by-master.md)
+Each row records the local free-for-all qualification against the preceding Master. Fixed-anchor win rates use the same G0 opponent, fillers and 120 paired seeds across generations. The two live board sizes have separate results in [the website results by Master generation](../results/live-by-master.md).
 
-| Generation | Agent and theory | Parent | Qualification | Fixed-anchor win rate |
-| --- | --- | --- | --- | --- |
-| G0 | Baseline · Original V0 heuristic | — | Initial policy | Pending |
+| Generation | Agent and theory | Parent | Master vs predecessor | Advantage (lower bound) | 3P / 4P edge | Seed pairs | Fixed-anchor win rate | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| G1 | carrier · V0 spends opening turns on unrelated moves when allies block its Marshal. I predict that choosing a route by the estimated turns needed to clear it, then moving the first ally that can step aside, will reduce the median own-turn count to first reach RING with the flag and increase the win rate against V0. | `3bd526b4cf8b` | 59.0% vs 14.2% | 44.8 pp (40.0 pp) | 54.7 / 34.9 pp | 1200 | 57.9% | [Qualification](qualifications/g0-1-beb232f2f941.json) |
+| G0 | baseline · Original V0 heuristic | — | — | — | — | — | 27.5% | [Initial results](../results/README.md) |

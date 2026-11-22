@@ -1,10 +1,93 @@
 {
-  "generation": 0,
-  "hash": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff",
-  "policyPath": "policies/master-g0.mjs",
-  "parent": null,
-  "qualification": null,
-  "promotedAt": null,
-  "theory": "Original V0 heuristic",
-  "agent": "baseline"
+  "generation": 1,
+  "hash": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9",
+  "parent": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff",
+  "policyPath": "league/policies/b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9.mjs",
+  "qualification": "g0-1-beb232f2f941",
+  "promotedAt": "2026-11-22T13:08:16.140Z",
+  "theory": "V0 spends opening turns on unrelated moves when allies block its Marshal. I predict that choosing a route by the estimated turns needed to clear it, then moving the first ally that can step aside, will reduce the median own-turn count to first reach RING with the flag and increase the win rate against V0.",
+  "agent": "carrier",
+  "sourceGeneration": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff",
+  "engineHash": "32e892cd2c48067663671ce4a6c8c5f9dc1e8839a7d5f07bc50e84e9775c2c44",
+  "stats": {
+    "complete": true,
+    "passed": true,
+    "attempt": 1,
+    "alpha": 0.025,
+    "overall": {
+      "pairs": 1200,
+      "games": 2400,
+      "challenger": 1415,
+      "master": 340,
+      "other": 642,
+      "draws": 3,
+      "candidateRate": 0.5895833333333333,
+      "masterRate": 0.14166666666666666,
+      "edge": 0.4479166666666667,
+      "lower": 0.40020115241197374,
+      "upper": 0.49544852782796056
+    },
+    "three": {
+      "pairs": 600,
+      "games": 1200,
+      "challenger": 821,
+      "master": 165,
+      "other": 211,
+      "draws": 3,
+      "candidateRate": 0.6841666666666667,
+      "masterRate": 0.1375,
+      "edge": 0.5466666666666666,
+      "lower": 0.48132289703685416,
+      "upper": 0.610744188611207
+    },
+    "four": {
+      "pairs": 600,
+      "games": 1200,
+      "challenger": 594,
+      "master": 175,
+      "other": 431,
+      "draws": 0,
+      "candidateRate": 0.495,
+      "masterRate": 0.14583333333333334,
+      "edge": 0.3491666666666667,
+      "lower": 0.28290286865705383,
+      "upper": 0.41523648616419706
+    },
+    "method": "One-sided fixed-grid mixture e-value bound for independent paired seed averages, with generation-wise alpha spending"
+  },
+  "anchor": {
+    "overall": {
+      "pairs": 120,
+      "games": 240,
+      "challenger": 139,
+      "master": 32,
+      "other": 69,
+      "draws": 0,
+      "candidateRate": 0.5791666666666667,
+      "masterRate": 0.13333333333333333,
+      "edge": 0.44583333333333336
+    },
+    "three": {
+      "pairs": 60,
+      "games": 120,
+      "challenger": 76,
+      "master": 15,
+      "other": 29,
+      "draws": 0,
+      "candidateRate": 0.6333333333333333,
+      "masterRate": 0.125,
+      "edge": 0.5083333333333333
+    },
+    "four": {
+      "pairs": 60,
+      "games": 120,
+      "challenger": 63,
+      "master": 17,
+      "other": 40,
+      "draws": 0,
+      "candidateRate": 0.525,
+      "masterRate": 0.14166666666666666,
+      "edge": 0.38333333333333336
+    }
+  }
 }

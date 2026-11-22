@@ -1,0 +1,35 @@
+{
+  "overall": {
+    "pairs": 120,
+    "games": 240,
+    "challenger": 66,
+    "master": 66,
+    "other": 106,
+    "draws": 2,
+    "candidateRate": 0.275,
+    "masterRate": 0.275,
+    "edge": 0
+  },
+  "three": {
+    "pairs": 60,
+    "games": 120,
+    "challenger": 35,
+    "master": 35,
+    "other": 48,
+    "draws": 2,
+    "candidateRate": 0.2916666666666667,
+    "masterRate": 0.2916666666666667,
+    "edge": 0
+  },
+  "four": {
+    "pairs": 60,
+    "games": 120,
+    "challenger": 31,
+    "master": 31,
+    "other": 58,
+    "draws": 0,
+    "candidateRate": 0.25833333333333336,
+    "masterRate": 0.25833333333333336,
+    "edge": 0
+  }
+}
