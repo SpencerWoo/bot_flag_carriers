@@ -4,6 +4,8 @@ These are completed games on Flag Carriers. Site bots are the opponents in its O
 
 | Master | Game type | Players | Games | Wins | Losses | Draws | Unscored | Win rate |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| G1 | Site bots | 3 | 2 | 2 | 0 | 0 | 0 | 100.0% |
+| G1 | Site bots | 4 | 2 | 1 | 1 | 0 | 0 | 50.0% |
 | G0 | Site bots | 3 | 1 | 1 | 0 | 0 | 0 | 100.0% |
 | G0 | Site bots | 4 | 1 | 0 | 1 | 0 | 0 | 0.0% |
 

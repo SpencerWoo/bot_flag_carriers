@@ -10,6 +10,14 @@ Three independent GPT-6.2 Astra researchers used ultra reasoning effort to propo
 
 All three qualified for the referee queue. Promotion requires an independent 2,400-game qualification against the current Master. [Generation history and qualifications](../league/leaderboard.md)
 
+## Promotion and website games
+
+The carrier strategy became G1 after winning 1,415 of 2,400 fresh games. G0 won 340, other seats won 642, and three games ended in a draw. The 44.79 percentage point lead had an adjusted one-sided lower bound of 40.02 points. Its lead was 54.67 points on the three-player board and 34.92 points on the four-player board. On the fixed 240-game benchmark, G1 won 57.9% and G0 won 27.5%. [Formal qualification](../league/qualifications/g0-1-beb232f2f941.json)
+
+One worker timed out during initialization after 356 completed pairs. A fresh worker completed the identical deal. The referee resumed the same frozen attempt with its previously recorded pairs and original seeds.
+
+G1 won both three-player website games and went 1–1 on the four-player board against the site's default bots. The wins finished at moves 31, 37 and 45. The loss finished at move 110. [Website results by generation](live-by-master.md)
+
 ## Self-play speed
 
 On this host, 24 reference games took 14.853 CPU seconds with the original engine and 5.570 with the optimized engine, a 2.67× speedup. Throughput increased from 286 to 762 plies per CPU second. Both produced the same actions and winners across all 4,246 plies. The combined trajectory SHA-256 was `ca3e0f174a417fc79403bfc1a0702dc72f66a670aa93ab939b17c2265c657267`.

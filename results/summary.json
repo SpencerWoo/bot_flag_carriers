@@ -1,18 +1,18 @@
 {
-  "updated": "2026-11-22T12:46:21.359Z",
+  "updated": "2026-11-22T13:18:55.469Z",
   "championVersion": 0,
   "live": {
     "3": {
-      "games": 1,
-      "wins": 1,
+      "games": 3,
+      "wins": 3,
       "losses": 0,
       "draws": 0,
       "unscored": 0
     },
     "4": {
-      "games": 1,
-      "wins": 0,
-      "losses": 1,
+      "games": 3,
+      "wins": 1,
+      "losses": 2,
       "draws": 0,
       "unscored": 0
     }
@@ -31,6 +31,34 @@
       "outcome": "W",
       "generation": 0,
       "hash": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff"
+    },
+    "aab2a0396ac64540b07237a0aac0952e500397713ba238f59cc5c56cdfc6de3e": {
+      "mode": 3,
+      "kind": "offline",
+      "outcome": "W",
+      "generation": 1,
+      "hash": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9"
+    },
+    "6ff23310ca47c3eaeeb31b3407ef3779586c8abf07ced9b6a075289a4ebd9f5f": {
+      "mode": 4,
+      "kind": "offline",
+      "outcome": "W",
+      "generation": 1,
+      "hash": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9"
+    },
+    "25e9326b14a85b9e62b824d02dc645ca441576a5946ab19a79df07c5ab7084e4": {
+      "mode": 3,
+      "kind": "offline",
+      "outcome": "W",
+      "generation": 1,
+      "hash": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9"
+    },
+    "7505c2a518cb77d1ba8e6870006966a9f19a6c2bd374fcda47ff21759a825d11": {
+      "mode": 4,
+      "kind": "offline",
+      "outcome": "L",
+      "generation": 1,
+      "hash": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9"
     }
   },
   "unattributedLiveTotals": {
@@ -54,24 +82,24 @@
     "fullParity": false,
     "coverage": {
       "3": {
-        "geometry": 14,
-        "transitions": 14,
+        "geometry": 38,
+        "transitions": 38,
         "types": {
-          "move": 14
+          "move": 38
         }
       },
       "4": {
-        "geometry": 37,
-        "transitions": 38,
+        "geometry": 77,
+        "transitions": 78,
         "types": {
-          "move": 37,
+          "move": 77,
           "recruit": 1
         }
       }
     },
     "reason": "Partial observation checks only. Test-game access is administrator-only; repetition/chasing and all hidden-state transitions remain uncertified."
   },
-  "decisionLatencyP95Ms": 38.803750999999465,
+  "decisionLatencyP95Ms": 35.093353000003844,
   "evaluations": [
     {
       "id": "1795347079946-7055018",
