@@ -101,5 +101,98 @@
         "edge": 0.38333333333333336
       }
     }
+  },
+  {
+    "generation": 2,
+    "hash": "5d24df3cbeec1b240248c7414598440167c466839c439c03d69da2b7d7539066",
+    "parent": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9",
+    "policyPath": "league/policies/5d24df3cbeec1b240248c7414598440167c466839c439c03d69da2b7d7539066.mjs",
+    "qualification": "g1-1-7487ca06c774",
+    "promotedAt": "2026-11-22T13:38:42.298Z",
+    "theory": "G0 showed that clearing a Marshal’s route can decide the opening race. My hypothesis is that a trailing player can recover by positioning a spy or artillery piece to attack RING one turn before the leading Marshal arrives. Against Master, I predict fewer rival deliveries and a higher win rate in games where a rival first gets within two moves of V.",
+    "agent": "carrier",
+    "sourceGeneration": "b39da925a820edd48fef0928f006de7afa06811d8801175103dd40d2f40f59a9",
+    "engineHash": "32e892cd2c48067663671ce4a6c8c5f9dc1e8839a7d5f07bc50e84e9775c2c44",
+    "stats": {
+      "complete": true,
+      "passed": true,
+      "attempt": 1,
+      "alpha": 0.025,
+      "overall": {
+        "pairs": 1200,
+        "games": 2400,
+        "challenger": 1092,
+        "master": 771,
+        "other": 530,
+        "draws": 7,
+        "candidateRate": 0.455,
+        "masterRate": 0.32125,
+        "edge": 0.13375,
+        "lower": 0.09742185695110095,
+        "upper": 0.17189342928376306
+      },
+      "three": {
+        "pairs": 600,
+        "games": 1200,
+        "challenger": 623,
+        "master": 408,
+        "other": 168,
+        "draws": 1,
+        "candidateRate": 0.5191666666666667,
+        "masterRate": 0.34,
+        "edge": 0.17916666666666667,
+        "lower": 0.12568794315821918,
+        "upper": 0.23701794211502403
+      },
+      "four": {
+        "pairs": 600,
+        "games": 1200,
+        "challenger": 469,
+        "master": 363,
+        "other": 362,
+        "draws": 6,
+        "candidateRate": 0.3908333333333333,
+        "masterRate": 0.3025,
+        "edge": 0.08833333333333333,
+        "lower": 0.040701051825593026,
+        "upper": 0.13839000588022543
+      },
+      "method": "One-sided fixed-grid mixture e-value bound for independent paired seed averages, with generation-wise alpha spending"
+    },
+    "anchor": {
+      "overall": {
+        "pairs": 120,
+        "games": 240,
+        "challenger": 148,
+        "master": 27,
+        "other": 65,
+        "draws": 0,
+        "candidateRate": 0.6166666666666667,
+        "masterRate": 0.1125,
+        "edge": 0.5041666666666667
+      },
+      "three": {
+        "pairs": 60,
+        "games": 120,
+        "challenger": 80,
+        "master": 12,
+        "other": 28,
+        "draws": 0,
+        "candidateRate": 0.6666666666666666,
+        "masterRate": 0.1,
+        "edge": 0.5666666666666667
+      },
+      "four": {
+        "pairs": 60,
+        "games": 120,
+        "challenger": 68,
+        "master": 15,
+        "other": 37,
+        "draws": 0,
+        "candidateRate": 0.5666666666666667,
+        "masterRate": 0.125,
+        "edge": 0.44166666666666665
+      }
+    }
   }
 ]
