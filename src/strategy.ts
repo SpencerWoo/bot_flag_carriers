@@ -1,3 +1,4 @@
+import { riskAtDestinations } from "./arena-threats.js";
 import {
   ARMY,
   board,
@@ -128,8 +129,11 @@ export function decide(
   m: Memory,
   w: Weights = DEFAULT,
   random = () => 0.5,
+  timeBudgetMs = 2000,
 ): Action | null {
-  const deadline = performance.now() + 2000;
+  const deadline = Number.isFinite(timeBudgetMs)
+    ? performance.now() + timeBudgetMs
+    : Infinity;
   observe(g, m);
   const actions = legalActions(g);
   if (!actions.length) return null;
@@ -145,66 +149,33 @@ export function decide(
     )?.[0];
   const goal = ownFlag?.pos || groundOwn || B.flagStart[me],
     toFlag = distances(g.mode, goal);
-  const enemies = g.pieces.filter((p) => p.owner !== me && !g.out[p.owner]);
-  // Threat probabilities use only public ranks and army composition.
-  const threats: Record<
-    string,
-    { p: Piece; rank: string; prob: number; fire: boolean }[]
-  > = {};
-  const relevant = new Set(
-    actions.map((a) => a.to || a.target).filter(Boolean),
-  );
-  threatLoop: for (const e of enemies) {
-    if (performance.now() > deadline - 50) break threatLoop;
-    const reach = new Map<string, Set<string>>();
-    for (const [rank, prob] of belief(g, e, m)) {
-      const kind = e.flags.length
-        ? "5"
-        : rank === "2"
-          ? "2"
-          : rank === "6"
-            ? "6"
-            : "5";
-      if (!reach.has(kind))
-        reach.set(
-          kind,
-          new Set(
-            moves(
-              B,
-              occ,
-              g.groundFlags,
-              e.pos,
-              { ...e, rank: kind },
-              false,
-            ).map((x) => x.to),
-          ),
-        );
-      for (const n of reach.get(kind)!)
-        if (relevant.has(n))
-          (threats[n] ??= []).push({ p: e, rank, prob, fire: false });
-      if (rank === "C")
-        for (const t of B.rays(e.pos)) {
-          if (
-            t.length >= 3 &&
-            t
-              .slice(0, 2)
-              .every(
-                (n: string) =>
-                  !B.castle(n) && !occ[n] && !(g.groundFlags[n] || []).length,
-              )
-          ) {
-            const n = B.castle(t[2]) ? "RING" : t[2];
-            if (relevant.has(n))
-              (threats[n] ??= []).push({ p: e, rank, prob, fire: true });
-          }
-        }
+  // Every unidentified piece of an army has the same remaining rank distribution.
+  const unknown = new Map<Seat, [string, number][]>();
+  const known = new Map<string, [string, number][]>();
+  const ranks = (p: Piece): [string, number][] => {
+    const rank = p.rank || m.known[p.id];
+    if (rank) {
+      let dist = known.get(rank);
+      if (!dist) {
+        dist = [[rank, 1]];
+        known.set(rank, dist);
+      }
+      return dist;
     }
-  }
+    let dist = unknown.get(p.owner);
+    if (!dist) {
+      dist = belief(g, p, m);
+      unknown.set(p.owner, dist);
+    }
+    return dist;
+  };
+  const byId = Object.fromEntries(g.pieces.map((p) => [p.id, p]));
+  const danger = riskAtDestinations(g, occ, ranks);
   let best = actions[0],
     bestScore = -Infinity;
   for (const a of actions) {
-    if (performance.now() > deadline) break;
-    const p = g.pieces.find((p) => p.id === a.pieceId)!;
+    if (deadline !== Infinity && performance.now() > deadline) break;
+    const p = byId[a.pieceId!];
     const dest = a.to || a.target!;
     const victim = occ[dest];
     let s = random() * 0.02;
@@ -212,10 +183,7 @@ export function decide(
       s =
         w.artillery *
           (victim
-            ? belief(g, victim, m).reduce(
-                (n, [r, prob]) => n + value(r) * prob,
-                0,
-              )
+            ? ranks(victim).reduce((n, [r, prob]) => n + value(r) * prob, 0)
             : 0) *
           w.capture -
         value("C");
@@ -224,7 +192,7 @@ export function decide(
       let survival = 1;
       if (victim) {
         survival = 0;
-        for (const [rank, prob] of belief(g, victim, m)) {
+        for (const [rank, prob] of ranks(victim)) {
           const r = duel(p.rank!, rank);
           s +=
             prob *
@@ -261,14 +229,7 @@ export function decide(
           (value(p.rank!) > 5 ? 1 : 0.5);
       if (a.dropFlags && p.flags.includes(me)) s -= w.flag * 2;
       if (g.groundFlags[dest]?.includes(me)) s += w.flag * 2;
-      let maxRisk = 0;
-      const perEnemy: Record<string, number> = {};
-      for (const t of threats[dest] || []) {
-        if (t.p.id === victim?.id) continue;
-        const loss = t.fire || duel(t.rank, p.rank!) >= 0;
-        perEnemy[t.p.id] = (perEnemy[t.p.id] || 0) + (loss ? t.prob : 0);
-      }
-      for (const x of Object.values(perEnemy)) maxRisk = Math.max(maxRisk, x);
+      const maxRisk = danger(dest, p.rank!);
       s -=
         survival * maxRisk * w.risk * (value(p.rank!) / 5 + (carries ? 3 : 0));
       if (dest === B.recruit[me]) s -= g.promo[me] >= 4 ? 5 : 0.3;

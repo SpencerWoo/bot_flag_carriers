@@ -28,6 +28,11 @@ export PATH="$(dirname "$node_bin"):$PATH"
 if [[ "${1:-}" == setup || ! -d node_modules ]]; then
   npm ci
   npm run build
+  touch dist/.built
   if [[ "${1:-}" == setup ]]; then exit 0; fi
+fi
+if [[ ! -f dist/.built || ! -f dist/src/league-worker.js || -n "$(find src -name '*.ts' -newer dist/.built -print -quit)" || tsconfig.json -nt dist/.built ]]; then
+  npm run build
+  touch dist/.built
 fi
 exec "$node_bin" --import tsx src/cli.ts "$@"

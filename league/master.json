@@ -1,0 +1,10 @@
+{
+  "generation": 0,
+  "hash": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff",
+  "policyPath": "policies/master-g0.mjs",
+  "parent": null,
+  "qualification": null,
+  "promotedAt": null,
+  "theory": "Original V0 heuristic",
+  "agent": "baseline"
+}

@@ -22,6 +22,6 @@ Two unranked bot games completed using the supplied account: a three-player win 
 
 Collected observations passed 51 movement/artillery geometry checks and 52 isolated transition checks, including one reinforcement. No discrepancies remain in the retained observable transitions. Fire handling also has a regression test based on the public client's reveal format; no live fire transition was observed in these two games.
 
-The server denied controlled test-game creation with `Only admins can create test games`. Full simulator parity remains unverified, especially repetition/chasing and unobserved hidden-state interactions. Automatic promotion remains blocked independently of the statistical result.
+The server denied controlled test-game creation with `Only admins can create test games`. Full simulator parity remains unverified, especially repetition/chasing and unobserved hidden-state interactions. The original weight tuner required full parity before promotion. The Master league now promotes on local evidence and reports website performance separately. [Master leaderboard](../league/leaderboard.md) · [Website results by generation](live-by-master.md)
 
 Run `./bot report` for the private local HTML report or `./bot export` to refresh the public aggregate files after future runs.

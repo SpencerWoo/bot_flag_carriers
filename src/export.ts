@@ -2,7 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { read, records } from "./storage.js";
 import { DEFAULT } from "./strategy.js";
+import { liveSnapshot, liveMarkdown, publicJson } from "./live-report.js";
 export function exportResults() {
+  const previous = publicJson<any>("results/summary.json", {});
   const current = read<any>("champion.json", { version: 0, weights: DEFAULT });
   const champion = {
     version: current.version,
@@ -27,7 +29,7 @@ export function exportResults() {
         time: c.time,
       });
   }
-  const evaluations = records("evaluations.jsonl").map((e) => ({
+  const fresh = records("evaluations.jsonl").map((e) => ({
     id: e.id,
     sourceHash: e.sourceHash,
     runtime: e.runtime,
@@ -45,34 +47,13 @@ export function exportResults() {
     screen: e.screen,
     time: e.time,
   }));
-  const games = new Map(
-    records("live-results.jsonl")
-      .filter((g) => g.finished)
-      .map((g) => [g.id, g]),
+  const allEvaluations = new Map(
+    (previous.evaluations ?? []).map((e: any) => [e.id, e] as const),
   );
-  const live = Object.fromEntries(
-    [3, 4].map((mode) => {
-      const selected = [...games.values()].filter((g) => g.mode === mode);
-      let wins = 0,
-        draws = 0;
-      for (const g of selected) {
-        const snapshot = read<any>(`checkpoint-${g.id}.json`, {}),
-          seat = snapshot.mySeats?.[0];
-        if (g.results?.[seat] === "W") wins++;
-        if (g.results?.[seat] === "D") draws++;
-      }
-      return [
-        mode,
-        {
-          games: selected.length,
-          wins,
-          draws,
-          losses: selected.length - wins - draws,
-        },
-      ];
-    }),
-  );
-  const parity = read<any>("parity-gate.json", {});
+  for (const e of fresh) allEvaluations.set(e.id, e);
+  const evaluations = [...allEvaluations.values()];
+  const live = liveSnapshot(previous);
+  const parity = read<any>("parity-gate.json", previous.validation ?? {});
   const latency = records("latency.jsonl")
     .map((x) => x.ms)
     .sort((a, b) => a - b);
@@ -80,7 +61,9 @@ export function exportResults() {
     updated: new Date().toISOString(),
     championVersion: champion.version,
 
-    live,
+    live: live.totals,
+    liveReceipts: live.receipts,
+    unattributedLiveTotals: live.unattributedLiveTotals,
     validation: {
       passed: parity.passed,
       fullParity: parity.fullParity,
@@ -89,11 +72,13 @@ export function exportResults() {
     },
     decisionLatencyP95Ms: latency.length
       ? latency[Math.floor((latency.length - 1) * 0.95)]
-      : null,
+      : (previous.decisionLatencyP95Ms ?? null),
     evaluations,
   };
   write("results/summary.json", summary);
+  fs.writeFileSync("results/live-by-master.md", liveMarkdown(live.rows));
   return {
+    liveByMaster: "results/live-by-master.md",
     champion: "strategies/champion.json",
     results: "results/summary.json",
   };

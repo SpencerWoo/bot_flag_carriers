@@ -1,18 +1,52 @@
 {
-  "updated": "2026-11-22T11:50:52.209Z",
+  "updated": "2026-11-22T12:46:21.359Z",
   "championVersion": 0,
   "live": {
     "3": {
       "games": 1,
       "wins": 1,
+      "losses": 0,
       "draws": 0,
-      "losses": 0
+      "unscored": 0
     },
     "4": {
       "games": 1,
       "wins": 0,
+      "losses": 1,
       "draws": 0,
-      "losses": 1
+      "unscored": 0
+    }
+  },
+  "liveReceipts": {
+    "bf1e01efa666c4348867dc3610452087cbeb5e70e6f3a939fc9f615d732422af": {
+      "mode": 4,
+      "kind": "offline",
+      "outcome": "L",
+      "generation": 0,
+      "hash": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff"
+    },
+    "4a9d514018a3c4bc130012d75d7a9327657418f2b6c46bcb070bd3e0663857a9": {
+      "mode": 3,
+      "kind": "offline",
+      "outcome": "W",
+      "generation": 0,
+      "hash": "3bd526b4cf8bf1c58938364dd4b1c5b6e978ac3ebae695d9d6cf338ba416e6ff"
+    }
+  },
+  "unattributedLiveTotals": {
+    "3": {
+      "games": 0,
+      "wins": 0,
+      "losses": 0,
+      "draws": 0,
+      "unscored": 0
+    },
+    "4": {
+      "games": 0,
+      "wins": 0,
+      "losses": 0,
+      "draws": 0,
+      "unscored": 0
     }
   },
   "validation": {

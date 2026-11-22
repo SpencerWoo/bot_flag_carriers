@@ -14,7 +14,16 @@ import { rng, type Seat } from "./core.js";
 import { append, save, read } from "./storage.js";
 const sourceHash = createHash("sha256")
   .update(
-    ["core", "simulator", "strategy", "evaluate", "pool", "worker"]
+    [
+      "core",
+      "simulator",
+      "arena-view",
+      "arena-threats",
+      "strategy",
+      "evaluate",
+      "pool",
+      "worker",
+    ]
       .map((n) =>
         fs.readFileSync(
           new URL(

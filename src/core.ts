@@ -8,7 +8,43 @@ const vendor = fs.existsSync(path.join(here, "../vendor/rules-core.cjs"))
   ? "../vendor/rules-core.cjs"
   : "../../vendor/rules-core.cjs";
 const { RBOARD, rLegal, rTargets } = require(vendor);
-export const board = (mode: number): any => RBOARD[mode];
+// Board topology is static. In particular four-player adjacency otherwise parses
+// coordinate strings for every possible move of every hidden rank.
+function indexBoard(raw: any) {
+  const nodes: string[] = raw.all(),
+    playable = [...nodes, "RING", raw.V];
+  const neighbors = new Map<string, readonly string[]>(),
+    rays = new Map<string, readonly (readonly string[])[]>();
+  const domain = new Set(playable);
+  for (const pos of playable) {
+    neighbors.set(pos, Object.freeze(raw.nb(pos)));
+    const lines = raw
+      .rays(pos)
+      .map((line: string[]) => Object.freeze([...line]));
+    for (const line of lines) for (const node of line) domain.add(node);
+    rays.set(pos, Object.freeze(lines));
+  }
+  const lakes = new Set([...domain].filter((n) => raw.lake(n))),
+    castle = new Set([...domain].filter((n) => raw.castle(n)));
+  const all = Object.freeze(nodes);
+  const empty = Object.freeze([]);
+  return Object.freeze({
+    ...raw,
+    all: () => all,
+    nb: (n: string) => neighbors.get(n) ?? empty,
+    rays: (n: string) => rays.get(n) ?? empty,
+    lake: (n: string) => lakes.has(n),
+    castle: (n: string) => castle.has(n),
+    recruit: Object.freeze({ ...raw.recruit }),
+    flagStart: Object.freeze({ ...raw.flagStart }),
+    seats: Object.freeze([...raw.seats]),
+  });
+}
+const boards: Record<number, any> = {
+  3: indexBoard(RBOARD[3]),
+  4: indexBoard(RBOARD[4]),
+};
+export const board = (mode: number): any => boards[mode];
 export const moves = rLegal as (
   b: any,
   occ: any,

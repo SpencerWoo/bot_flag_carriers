@@ -1,3 +1,4 @@
+import { arenaPlayerView } from "./arena-view.js";
 import {
   ARMY,
   board,
@@ -176,7 +177,10 @@ export function simActions(
       a[key] = [];
       if (drop) a.dropBlocked = {};
       for (const m of moves(B, occ, g.groundFlags, p.pos, p, drop)) {
-        const path = permittedPath(g, p, m.to, drop, occ),
+        // Edge histories only restrict the same piece on successive turns.
+        const path =
+            g.histories[seat]?.piece !== p.id ||
+            permittedPath(g, p, m.to, drop, occ),
           ch = g.chases[seat],
           t = ch && g.pieces.find((q) => q.id === ch.target);
         const chaseBlocked =
@@ -199,19 +203,7 @@ export function simActions(
   return out;
 }
 export function view(g: SimState, seat: Seat): Game {
-  const v = structuredClone(g) as Game;
-  delete v.flagsLast;
-  delete v.histories;
-  delete v.chases;
-  delete v.pending;
-  delete v.nextTurn;
-  delete v.seed;
-  delete v.reveal;
-  v.mySeats = [seat];
-  v.actions = seat === g.turn ? simActions(g) : {};
-  for (const p of v.pieces)
-    if (p.owner !== seat && !g.reveal.includes(p.id)) p.rank = null;
-  return v;
+  return arenaPlayerView(g, seat);
 }
 function drop(g: SimState, pos: string, flags: Seat[]) {
   if (flags.length) (g.groundFlags[pos] ??= []).push(...flags);

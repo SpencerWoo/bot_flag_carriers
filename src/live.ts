@@ -1,14 +1,8 @@
 import { lock, stopping } from "./control.js";
 import { Client, ApiError } from "./api.js";
-import {
-  decide,
-  newMemory,
-  observe,
-  setupSwap,
-  DEFAULT,
-  type Weights,
-  type Memory,
-} from "./strategy.js";
+import { type Weights, validateWeights } from "./strategy.js";
+import { LiveMaster, type LivePin } from "./live-master.js";
+import { digest } from "./master-git.js";
 import { append, save, read } from "./storage.js";
 import { checkGeometry, checkTransition } from "./parity.js";
 import { type Game, type Action } from "./core.js";
@@ -29,6 +23,7 @@ export interface LiveOptions {
   minutes?: number;
   maxActions?: number;
   weights?: Weights;
+  master?: LivePin;
 }
 export async function play(options: LiveOptions = {}) {
   const release = lock("live");
@@ -63,8 +58,7 @@ async function playLocked(options: LiveOptions) {
     id = created.id;
     save("live.json", { id, kind: options.kind || "offline" });
   }
-  let g: Game = await client.game(id),
-    mem: Memory = read("memory-" + id + ".json", newMemory());
+  let g: Game = await client.game(id);
   const pending = read<any>("pending.json", null);
   if (pending && pending.id !== id)
     throw Error(
@@ -75,8 +69,16 @@ async function playLocked(options: LiveOptions) {
       "Uncertain previous submission: server state is unchanged. Inspect pending.json before clearing; no action was retried.",
     );
   save("pending.json", null);
-  const end = Date.now() + 60000 * (options.minutes ?? 120),
-    w = options.weights || read("champion.json", { weights: DEFAULT }).weights;
+  const end = Date.now() + 60000 * (options.minutes ?? 120);
+  const source = options.weights
+    ? `export default ({baseline})=>baseline(${JSON.stringify(validateWeights(options.weights))});`
+    : undefined;
+  const player = await LiveMaster.open(
+    id,
+    g.mySeats,
+    source ? { generation: 0, hash: digest(source), source } : options.master,
+  );
+  let streamError: unknown;
   let count = 0,
     errors = 0,
     geometryChecks = 0,
@@ -88,7 +90,9 @@ async function playLocked(options: LiveOptions) {
       id,
       (v) => {
         if (v.id === id && Array.isArray(v.pieces)) {
-          observe(v, mem);
+          void player.observe(v).catch((e) => {
+            streamError = e;
+          });
           eventView = v;
         }
       },
@@ -155,7 +159,6 @@ async function playLocked(options: LiveOptions) {
     g = next;
     count++;
     errors = 0;
-    save("memory-" + id + ".json", mem);
     save("checkpoint-" + id + ".json", g);
     if (count % 10 === 0)
       console.log(
@@ -180,7 +183,7 @@ async function playLocked(options: LiveOptions) {
       if (g.status === "setup") {
         const s = g.mySeats.find((s) => !g.ready[s]);
         if (s) {
-          const a = setupSwap(g, s, w);
+          const a = await player.setup(g, s);
           await transact(a || { type: "ready", seat: s, value: true });
           continue;
         }
@@ -192,8 +195,10 @@ async function playLocked(options: LiveOptions) {
         throw Error(geometry.join("; "));
       }
       if (g.mySeats.includes(g.turn)) geometryChecks++;
-      const start = performance.now(),
-        a = decide(g, mem, w);
+      if (streamError) throw streamError;
+      const start = performance.now();
+      await player.observe(g);
+      const a = await player.choose(g);
       const elapsed = performance.now() - start;
       if (a) {
         append("latency.jsonl", { id, ms: elapsed });
@@ -209,11 +214,15 @@ async function playLocked(options: LiveOptions) {
     }
   } finally {
     controller.abort();
-    save("memory-" + id + ".json", mem);
+    player.close();
     save("checkpoint-" + id + ".json", g);
   }
   const summary = {
     id,
+    masterGeneration: player.pin.generation,
+    masterHash: player.pin.hash,
+    seat: g.mySeats[0],
+    kind: g.testMode ? "test" : g.offline ? "offline" : "friendly",
     mode: g.mode,
     status: g.status,
     results: g.results,

@@ -12,7 +12,8 @@
     "bot": "tsx src/cli.ts",
     "check": "tsc --noEmit",
     "format": "prettier --write src test package.json tsconfig.json README.md SOURCES.md candidate.example.json .github/workflows/check.yml",
-    "format:check": "prettier --check src test package.json tsconfig.json README.md SOURCES.md candidate.example.json .github/workflows/check.yml"
+    "format:check": "prettier --check src test package.json tsconfig.json README.md SOURCES.md candidate.example.json .github/workflows/check.yml",
+    "pretest": "npm run build"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

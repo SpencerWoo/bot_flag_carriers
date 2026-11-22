@@ -1,64 +1,68 @@
-# Flag Carriers learning agent
+# Flag Carriers Master league
 
-A reproducible local strategy league and an authenticated player for [Flag Carriers](https://play.flag-carriers.workers.dev). Supports three- and four-player free-for-all games. Live play uses the server's legal actions and only information available to this account.
+Three researchers develop executable policies for the three- and four-player Flag Carriers boards. Each starts from the current **Master**, writes down a theory, and tests its policy in seeded multiplayer games. A separate referee can promote a candidate to the next generation. [Master leaderboard](league/leaderboard.md) · [Website results](results/live-by-master.md)
 
 ```sh
 ./bot setup
+./bot leaderboard
+./bot learn --session first-league --minutes 120 --rounds 1 --live-games 0
+./bot master queue
+./bot report
+```
+
+`learn` runs three `gpt-6.2-astra` researchers at `ultra` reasoning effort through an authenticated Codex CLI. Each has a detached Git worktree at its starting commit. The coordinator gives the researcher the Master source, player interface, and feedback from its previous screens. It runs submitted policies in a shared pool of referee processes. `--rounds 1` gives each researcher one proposal in this invocation. Omit it to iterate until the time budget expires. Reuse the session name to continue the experiment history. All sessions on a referee host use the same qualification queue.
+
+The launcher supports Node.js 24+ and bootstraps a checksum-verified Node 24.15.0 on Linux or macOS (x64 or arm64). Set `FLAG_CARRIERS_NODE` to use a particular executable. Set `FLAG_CARRIERS_WORKERS` to limit simulation concurrency. The pool respects the available CPUs. Research and qualification share those slots.
+
+## How a generation earns the title
+
+1. **Development.** Every seat runs a distinct policy instance with its own memory and random stream. Each proposal plays the Master on both boards with seat-swapped deals and fixed filler opponents. A 12-pair screen drops clearly losing ideas. The full development screen uses 48 pairs and requires an observed lead of three percentage points. The researcher receives the measured results.
+2. **Qualification.** Freeze the submitted code. The referee draws 1,200 fresh seed pairs, 600 per board size. One challenger and one Master play in each game. The second game in the pair swaps their seats. Other seats use fixed policies and available past Masters. All 2,400 games must finish. A win by a third seat contributes zero to both win totals.
+3. **Decision.** The challenger needs an observed win-rate lead of at least three percentage points, a positive lower confidence bound and no significant loss on either board. Each seed pair supplies one observation. The referee adjusts the evidence threshold for repeated challenges to a given generation. It also measures successful challengers against a fixed historical roster so generations have a common benchmark.
+4. **Publication.** The winning source, qualification evidence, generation history and leaderboard advance in one Git commit. The push checks the expected remote head. A challenger overtaken by another promotion gets a fresh comparison against the new Master. Researchers fetch the latest published Master at job boundaries. Interrupted qualifications reuse the frozen candidate and completed pairs.
+
+The canonical branch defaults to `origin/main`. The referee machine needs read access to fetch it and write access for unattended promotion. `./bot master qualify --prepare` creates the exact publication files and expected Git head for a connected publisher. `./bot master publish` retries a prepared publication and reconciles an already-published commit. Keep one durable referee store (`FLAG_CARRIERS_LEAGUE_DATA`, default `.runtime/league/`) to preserve generation attempt counts and unfinished work.
+
+```sh
+./bot research --session openings --rounds 1 --minutes 30
+./bot master submit --candidate candidate.mjs --agent my-agent --theory 'Clear the Marshal’s shortest route early'
+./bot master qualify --minutes 120
+./bot master status --sync
+./bot leaderboard --sync
+```
+
+`research` runs the development stage against the Master in the current checkout and queues passing submissions. `learn` includes research, qualification and any requested live games. `master qualify` processes one pending candidate. `./bot benchmark --pairs 12` measures arena throughput. Existing weight experiments remain available through `./bot tune`, `./bot evaluate`, `./bot match` and `./bot replay`.
+
+## Policy interface
+
+A policy is a self-contained JavaScript module. Its default export is called once per seat per game. The factory receives a seeded `random`, public board geometry, distances, legal actions, and a V0 baseline helper. `setup(view)` can choose the opening carrier rank. `observe(view)` receives public reveals between turns. `choose(view)` returns a legal move, fire or reinforcement action. The player sees its own ranks and public observations. Neither the hidden deal nor the scenario seed is included in its view.
+
+```js
+export default ({ baseline }) => {
+  const player = baseline();
+  return {
+    setup: (view) => player.setup(view),
+    observe: (view) => player.observe(view),
+    choose: (view) => player.choose(view),
+  };
+};
+```
+
+## Playing on the website
+
+```sh
+./bot auth                 # reads FLAG_CARRIERS_EMAIL and FLAG_CARRIERS_PASSWORD
 ./bot auth --check
-./bot match --mode 3 --seed 42
-./bot replay
-./bot live --mode 4 --kind offline --minutes 20
+./bot live --mode 3 --kind offline --minutes 30
 ./bot validate
-./bot learn --minutes 120 --live-games 4
 ./bot report
 ./bot export
 ```
 
-`./bot` uses Node.js 24+ when installed, otherwise downloads Node 24.15.0 from nodejs.org and verifies its SHA-256. `./bot setup` installs locked dependencies and builds TypeScript. Set `FLAG_CARRIERS_NODE` to use a particular Node executable. Linux and macOS on x64 and arm64 are supported by the bootstrap.
+The website calls its unranked bot mode **Offline**. These games run on the actual service. `--kind friendly` creates a human lobby. `--id GAME_ID` selects an existing game. A live match pins its Master generation, journals player-visible observations, and restores its policy state on resume. The runner checks the chosen action against the server's legal list before submitting it. A lost response triggers state reconciliation. An unresolved submission is saved for inspection. Ranked and team play are disabled.
 
-## Authentication and privacy
+`learn` defaults to two hours and up to four live bot games, with 25% of the budget (up to 30 minutes) reserved for those games. Use `--live-games 0` for a local session. Website sign-in uses the two environment variables above. The session cookie, private traces and journals stay in `.runtime/`, which Git ignores. The public export contains aggregate results.
 
-For a fresh sign-in, supply `FLAG_CARRIERS_EMAIL` and `FLAG_CARRIERS_PASSWORD` through your shell's environment or secret manager, then run `./bot auth`. Do not put a password in a command-line argument or tracked file. `./bot auth --check` checks the saved session without requiring the password again.
+Master promotion measures local strength. The website restricts controlled test-game creation to administrators. `validate` checks observable transitions from ordinary live games, and the website report shows how each tested generation performed against the service bots. [Initial validation](results/README.md) · [Game rules sources](SOURCES.md)
 
-The supplied account was authenticated during implementation. Only its session cookie is saved locally in `.runtime/session.json`, with owner-only permissions. Passwords are not persisted. `.runtime/`, environment files, logs, and dependencies are excluded from Git. The committed `.env.example` contains names only; the CLI does not automatically source `.env`.
-
-All private runtime data stays under `.runtime/` (override with `FLAG_CARRIERS_DATA`). Reports and traces may contain game observations and player identifiers; keep the directory private. No chat, email, friend, profile, or account-management actions are implemented.
-
-## Local learning
-
-`match` runs a seeded local game without rendering or real-time delays. `--mode 3|4`, `--seed N`, and `--slot N` select the scenario. `replay` replays the most recent local match's saved actions. Each seat receives a masked view and its own memory; hidden ranks never enter the policy. Public reveals, surviving known ranks, graveyards, and army composition inform combat probabilities.
-
-The initial policy protects and advances its flag, contests the bunker, considers probable exchanges and immediate threats, uses artillery and reinforcements, and penalizes repeated visits. Setup places the configured carrier rank on the flag's starting square. Search varies six decision weights and the carrier rank.
-
-```sh
-./bot evaluate --candidate candidate.example.json --games 600 --seed 100000
-./bot learn --minutes 120 --rounds 1 --live-games 4
-```
-
-A learning round screens six challengers on 12 paired scenarios each, then evaluates the finalist on 600 fresh pairs, equally split between the two boards and balanced across seats. Each pair shares seed, seat, initial background armies, and roster. Background opponents include the champion and two fixed heuristic variants. Up to four isolated worker processes run pairs concurrently (`FLAG_CARRIERS_WORKERS=1` forces serial execution).
-
-Promotion requires complete games, a positive one-sided 95% Hoeffding lower bound on paired win-rate improvement, no statistically significant regression on either board, and certified simulator parity. The bound is conservative and supports differences in [-1, 1]; repeated learning runs do not constitute a simultaneous lifetime guarantee. A sample of better-looking wins is insufficient for promotion. Draws count as non-wins. Unfinished or interrupted evaluations cannot promote a strategy.
-
-Champion versions, parent versions, seeds, policy/engine fingerprints, paired results, and promotion decisions are saved. Historical champions are retained for rollback and inspection. Candidates and failed evaluations are also retained. An unchanged champion is a valid outcome. `./bot export` writes the champion, its history, and aggregate evaluation results into `strategies/` and `results/` for committing to Git. It omits credentials, account names, game identifiers, and private traces. A fresh clone reads the exported champion when no runtime champion exists.
-
-## Live play and recovery
-
-The website calls its unranked bot mode **Offline**; it still runs on the live website. This is the default. `--kind friendly` explicitly creates a human lobby; `--id GAME_ID` resumes a particular game. Ranked games and teams are rejected. One live game runs at a time, enforced by a process lock. The learning command starts at most four live bot games, and defaults to a two-hour total budget. It reserves 25% of that budget (up to 30 minutes) for live evaluation.
-
-The runner handles setup, moves, artillery, and reinforcement choices. Decisions have a two-second policy budget. It uses the event stream when available, with polling as a fallback. Decisions are based on refreshed state; move submissions are never blindly retried after a lost response. Every accepted action is checkpointed, and SIGINT/SIGTERM requests a clean stop at the next action boundary.
-
-Restart `./bot live` to resume the saved game. An unresolved `pending.json` blocks submission if the server state has not changed; inspect the game and recorded action before clearing it. Authentication failures, rate limiting, repeated action rejection, or a parity discrepancy stop play. Finished games clear the active checkpoint. A time limit checkpoints the game rather than automatically resigning. Human games retain their server clocks while the process is stopped.
-
-## Validation status and limitation
-
-The account can create live bot games, but `/api/games` returns **403: Only admins can create test games** for test mode. Therefore full controlled server parity cannot currently be established. `./bot validate` replays the collected observable transitions and checks movement/artillery geometry against server legal actions, respecting the server's repetition/chasing exclusions. These checks are useful but do not certify the local repetition/chasing model or every hidden-state transition.
-
-**Automatic champion promotion remains blocked while full parity is unverified.** No current command silently turns partial validation into certification. Restoring an authorized controlled reference environment or obtaining authoritative engine fixtures is required before enabling this gate. Local search, saved candidates, statistical evaluation, and live bot play work independently of that gate. Do not interpret local win rates as measured performance against human players.
-
-```sh
-npm test
-npm run check
-npm run build
-```
-
-Tests cover both boards, special moves, combat, flag exchange and ownership, reinforcement, clocks, repetition, hidden-information isolation, checkpoint replay, seeded reproducibility, server-action selection, and the observed combat-reveal format. See [SOURCES.md](SOURCES.md) for the public board and rules assets used as references.
+Run `npm test` for the tests and production build, or `npm run check` for static type checking.
