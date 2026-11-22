@@ -5,20 +5,10 @@ import { spawn, execFileSync } from "node:child_process";
 
 export const RESEARCH_MODEL = "gpt-6.2-astra";
 export const RESEARCH_EFFORT = "ultra";
-export const researchRoles = [
-  [
-    "carrier",
-    "experiment with carrier development, opening routes, and clearing the path to victory",
-  ],
-  [
-    "inference",
-    "exploit public rank reveals, opponent movement clues, and economically favorable exchanges",
-  ],
-  [
-    "threats",
-    "detect immediate enemy victory threats and tactical bunker opportunities in multiplayer",
-  ],
-] as const;
+// Keep the winning researcher's history when upgrading an existing league.
+export const SOLO_AGENT = "carrier";
+export const researchFocus =
+  "Find the largest remaining weakness in the current Master. Consider opening routes, flag delivery, public rank inference, and denying enemy wins. Choose a theory based on prior results.";
 
 export interface ResearchMaster {
   generation: number;

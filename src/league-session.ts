@@ -4,11 +4,13 @@ import { LeaguePool } from "./league-pool.js";
 import {
   currentMaster,
   enqueueCandidate,
-  hasPendingCandidates,
+  queue,
   runQualification,
   type QualificationOutcome,
 } from "./master-league.js";
-import { pin } from "./master-store.js";
+import { pin, get, type QueueEntry } from "./master-store.js";
+import { SOLO_AGENT } from "./research-runner.js";
+import type { QualificationStats } from "./master-stats.js";
 import { schedule } from "./master-stats.js";
 import { runResearchers, type ResearchProposal } from "./research.js";
 import { root } from "./storage.js";
@@ -138,31 +140,61 @@ export async function runLeague(options: LeagueOptions) {
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
   const timer = setTimeout(stop, Math.max(0, researchDeadline - Date.now()));
-  let researchDone = false;
   const results: QualificationOutcome[] = [],
     live: unknown[] = [];
-  async function referee() {
-    if (developmentOnly) return;
-    while (!controller.signal.aborted) {
-      if (hasPendingCandidates()) {
-        const result = await runQualification({
-          pool,
-          workers: pool.size,
-          deadline: researchDeadline,
-          signal: controller.signal,
-          publish: options.prepare ? "prepare" : "git",
-        });
-        results.push(result);
-        notice({ event: "qualification", ...result });
-        if (result.status === "incomplete" || result.status === "prepared")
-          break;
-      } else if (researchDone) break;
-      else await new Promise((r) => setTimeout(r, 350));
+  function feedback(entry: QueueEntry) {
+    const stats = entry.run
+      ? get<QualificationStats | null>(
+          "runs/" + entry.run + "/result.json",
+          null,
+        )
+      : null;
+    if (!stats) return "Formal status: " + entry.state + ".";
+    const pp = (n: number) => (n * 100).toFixed(1) + " pp";
+    return (
+      "Formal status: " +
+      entry.state +
+      ". In " +
+      stats.overall.games +
+      " fresh games the overall edge was " +
+      pp(stats.overall.edge) +
+      " (lower bound " +
+      pp(stats.overall.lower) +
+      "), three-player " +
+      pp(stats.three.edge) +
+      " and four-player " +
+      pp(stats.four.edge) +
+      "."
+    );
+  }
+  async function drainSoloQueue() {
+    while (!developmentOnly && !controller.signal.aborted && !stopping) {
+      const next = queue().find(
+        (e) =>
+          e.agent === SOLO_AGENT &&
+          ["queued", "running", "prepared"].includes(e.state),
+      );
+      if (!next) return;
+      const result = await runQualification({
+        id: next.id,
+        pool,
+        workers: pool.size,
+        deadline: researchDeadline,
+        signal: controller.signal,
+        publish: options.prepare ? "prepare" : "git",
+      });
+      results.push(result);
+      notice({ event: "qualification", ...result });
+      if (result.status === "incomplete" || result.status === "prepared") {
+        stop();
+        return;
+      }
     }
   }
   try {
-    const snapshot = () => currentMaster({ sync: !developmentOnly });
-    const researchers = runResearchers({
+    await drainSoloQueue();
+    const snapshot = () => currentMaster({ sync: true });
+    const research = await runResearchers({
       repo: process.cwd(),
       directory: path.join(root, "research", options.session),
       master: snapshot,
@@ -179,26 +211,20 @@ export async function runLeague(options: LeagueOptions) {
           };
         return screenProposal(p, latest.source, pool, time, signal);
       },
-      submit: (p) =>
-        enqueueCandidate({
+      submit: async (p) => {
+        const sub = enqueueCandidate({
           source: p.source,
           theory: p.theory,
           agent: p.agent,
           parent: p.parent,
-        }),
+        });
+        if (developmentOnly) return;
+        await drainSoloQueue();
+        const entry = queue().find((e) => e.id === sub.id)!;
+        return { feedback: feedback(entry) };
+      },
       notice,
-    }).finally(() => {
-      researchDone = true;
     });
-    const [research, qualification] = await Promise.allSettled([
-      researchers,
-      referee().catch((e) => {
-        stop();
-        throw e;
-      }),
-    ]);
-    if (research.status === "rejected") throw research.reason;
-    if (qualification.status === "rejected") throw qualification.reason;
     clearTimeout(timer);
     if (!developmentOnly && !stopping && Date.now() < deadline - 60000) {
       for (
@@ -219,7 +245,7 @@ export async function runLeague(options: LeagueOptions) {
     }
     return {
       session: options.session,
-      research: research.value,
+      research,
       qualification: results,
       live,
     };

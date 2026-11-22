@@ -3,6 +3,8 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { researchEnvironment } from "./research-runner.js";
 import type { QualificationStats, AnchorScore } from "./master-stats.js";
 export const digest = (text: string | Buffer) =>
   createHash("sha256").update(text).digest("hex");
@@ -27,6 +29,10 @@ export const branchName = () =>
   process.env.FLAG_CARRIERS_MASTER_BRANCH || "main";
 export const remoteName = () =>
   process.env.FLAG_CARRIERS_MASTER_REMOTE || "origin";
+export const canonicalPushUrl = (url: string) =>
+  /^(?:git@github\.com:|https:\/\/github\.com\/|ssh:\/\/git@github\.com\/)SpencerWoo\/bot_flag_carriers(?:\.git)?$/i.test(
+    url,
+  );
 export function fetchMasterHead() {
   const branch = branchName(),
     remote = remoteName();
@@ -171,10 +177,46 @@ export function publishTree(p: Publication) {
     git(["rev-parse", p.commit + "^{tree}"]).trim() !== p.tree
   )
     throw Error("Prepared Git commit mismatch");
-  git([
-    "push",
-    "--force-with-lease=refs/heads/" + p.branch + ":" + p.expectedHead,
-    remoteName(),
-    p.commit + ":refs/heads/" + p.branch,
-  ]);
+  try {
+    git([
+      "push",
+      "--force-with-lease=refs/heads/" + p.branch + ":" + p.expectedHead,
+      remoteName(),
+      p.commit + ":refs/heads/" + p.branch,
+    ]);
+  } catch (error: any) {
+    const pushUrl = git([
+      "remote",
+      "get-url",
+      "--push",
+      "--all",
+      remoteName(),
+    ]).trim();
+    if (
+      p.branch !== "main" ||
+      !canonicalPushUrl(pushUrl) ||
+      !/permission denied|authentication failed|could not read username|could not read from remote repository|host key verification failed/i.test(
+        String(error.stderr),
+      )
+    )
+      throw error;
+    const asTs = import.meta.url.endsWith(".ts");
+    const cli = fileURLToPath(
+      new URL("./connected-publisher." + (asTs ? "ts" : "js"), import.meta.url),
+    );
+    execFileSync(
+      process.execPath,
+      [...(asTs ? ["--import", "tsx"] : []), cli],
+      {
+        cwd: checkout(),
+        env: {
+          ...researchEnvironment(),
+          FLAG_CARRIERS_LEAGUE_REPO: checkout(),
+        },
+        input: JSON.stringify(p),
+        timeout: 100000,
+        stdio: ["pipe", "pipe", "pipe"],
+      },
+    );
+  }
 }

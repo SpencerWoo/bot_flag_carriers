@@ -11,7 +11,7 @@ import { runArenaBenchmark } from "./arena-benchmark.js";
 import { report } from "./report.js";
 import { read, save } from "./storage.js";
 import { runLeague } from "./league-session.js";
-import { masterCommand } from "./master-league.js";
+import { currentMaster, masterCommand } from "./master-league.js";
 import { initial, step } from "./simulator.js";
 const [command = "help", ...args] = process.argv.slice(2);
 const option = (key: string, fallback: string) => {
@@ -98,6 +98,7 @@ try {
     if (!["test", "offline", "friendly"].includes(kind))
       throw Error("Kind must be test, offline or friendly");
     await play({
+      master: currentMaster({ sync: true }),
       mode: num("mode", 4),
       kind: kind as any,
       id: option("id", "") || undefined,

@@ -5,7 +5,8 @@ import {
   generatePolicy,
   privateJson,
   jsonOr,
-  researchRoles,
+  SOLO_AGENT,
+  researchFocus,
   RESEARCH_EFFORT,
   RESEARCH_MODEL,
   type ModelJob,
@@ -87,7 +88,7 @@ const wait = (ms: number) =>
 const digest = (source: string) =>
   createHash("sha256").update(source).digest("hex");
 
-/** Parallel theory generation; callers share their one arena pool between all screen callbacks and qualification. */
+/** One researcher retains its history across proposals and Master generations. */
 export async function runResearchers(options: ResearchersOptions) {
   if (!Number.isFinite(options.deadline))
     throw Error("Researchers need a finite deadline");
@@ -275,8 +276,25 @@ export async function runResearchers(options: ResearchersOptions) {
           }
         }
         // Enqueue is idempotent by content hash if restart occurs just after acceptance.
-        await options.submit(proposal);
-        record("submitted");
+        const receipt = await options.submit(proposal);
+        const feedback =
+          receipt &&
+          typeof receipt === "object" &&
+          "feedback" in receipt &&
+          typeof receipt.feedback === "string"
+            ? receipt.feedback
+            : "";
+        record(
+          "submitted",
+          feedback
+            ? {
+                summary: [state.summary, feedback]
+                  .filter(Boolean)
+                  .join(" ")
+                  .slice(0, 4000),
+              }
+            : {},
+        );
         totals.submitted++;
         consecutiveFailures = 0;
       } catch (e: any) {
@@ -297,19 +315,7 @@ export async function runResearchers(options: ResearchersOptions) {
     return totals;
   }
   try {
-    const results = await Promise.allSettled(
-      researchRoles.map(([agent, focus]) => slot(agent, focus)),
-    );
-    const failures = results.flatMap((r, i) =>
-      r.status === "rejected"
-        ? [researchRoles[i][0] + ": " + String(r.reason?.message ?? r.reason)]
-        : [],
-    );
-    if (failures.length)
-      throw Error("Researcher coordinator errors: " + failures.join(", "));
-    return results.map(
-      (r) => (r as PromiseFulfilledResult<ResearchSlotSummary>).value,
-    );
+    return [await slot(SOLO_AGENT, researchFocus)];
   } finally {
     if (fs.readFileSync(lease, "utf8") === String(process.pid))
       fs.unlinkSync(lease);
