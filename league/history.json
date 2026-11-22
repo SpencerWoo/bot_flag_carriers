@@ -194,5 +194,98 @@
         "edge": 0.44166666666666665
       }
     }
+  },
+  {
+    "generation": 3,
+    "hash": "f587462ab05307ae02185daf1908a6c4010afbfdd58b78594661f58508a60a63",
+    "parent": "5d24df3cbeec1b240248c7414598440167c466839c439c03d69da2b7d7539066",
+    "policyPath": "league/policies/f587462ab05307ae02185daf1908a6c4010afbfdd58b78594661f58508a60a63.mjs",
+    "qualification": "g2-1-a206e5d62c13",
+    "promotedAt": "2026-11-22T14:42:50.454Z",
+    "theory": "Generation 2 lost its original Marshal in 29 of 53 development nonwins. Once that happens, it delegates both flag recovery and the replacement carrier’s route to V0. I predict that choosing a pickup by its chance of surviving the next enemy turns, then routing the replacement according to its actual rank, will increase both post-Marshal flag deliveries and overall matched-seed wins.",
+    "agent": "carrier",
+    "sourceGeneration": "5d24df3cbeec1b240248c7414598440167c466839c439c03d69da2b7d7539066",
+    "engineHash": "32e892cd2c48067663671ce4a6c8c5f9dc1e8839a7d5f07bc50e84e9775c2c44",
+    "stats": {
+      "complete": true,
+      "passed": true,
+      "attempt": 1,
+      "alpha": 0.025,
+      "overall": {
+        "pairs": 1200,
+        "games": 2400,
+        "challenger": 1132,
+        "master": 761,
+        "other": 499,
+        "draws": 8,
+        "candidateRate": 0.4716666666666667,
+        "masterRate": 0.31708333333333333,
+        "edge": 0.15458333333333332,
+        "lower": 0.11633254381176528,
+        "upper": 0.19457237013551776
+      },
+      "three": {
+        "pairs": 600,
+        "games": 1200,
+        "challenger": 630,
+        "master": 405,
+        "other": 161,
+        "draws": 4,
+        "candidateRate": 0.525,
+        "masterRate": 0.3375,
+        "edge": 0.1875,
+        "lower": 0.13028550555656437,
+        "upper": 0.2482223504207255
+      },
+      "four": {
+        "pairs": 600,
+        "games": 1200,
+        "challenger": 502,
+        "master": 356,
+        "other": 338,
+        "draws": 4,
+        "candidateRate": 0.41833333333333333,
+        "masterRate": 0.2966666666666667,
+        "edge": 0.12166666666666667,
+        "lower": 0.07208370316278945,
+        "upper": 0.17429054531455535
+      },
+      "method": "One-sided fixed-grid mixture e-value bound for independent paired seed averages, with generation-wise alpha spending"
+    },
+    "anchor": {
+      "overall": {
+        "pairs": 120,
+        "games": 240,
+        "challenger": 163,
+        "master": 24,
+        "other": 52,
+        "draws": 1,
+        "candidateRate": 0.6791666666666667,
+        "masterRate": 0.1,
+        "edge": 0.5791666666666667
+      },
+      "three": {
+        "pairs": 60,
+        "games": 120,
+        "challenger": 89,
+        "master": 11,
+        "other": 20,
+        "draws": 0,
+        "candidateRate": 0.7416666666666667,
+        "masterRate": 0.09166666666666666,
+        "edge": 0.65
+      },
+      "four": {
+        "pairs": 60,
+        "games": 120,
+        "challenger": 74,
+        "master": 13,
+        "other": 32,
+        "draws": 1,
+        "candidateRate": 0.6166666666666667,
+        "masterRate": 0.10833333333333334,
+        "edge": 0.5083333333333333
+      }
+    }
   }
 ]
