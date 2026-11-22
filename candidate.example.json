@@ -1,0 +1,9 @@
+{
+  "capture": 5,
+  "risk": 7,
+  "flag": 5,
+  "advance": 0.6,
+  "novelty": 1.8,
+  "artillery": 1,
+  "carrier": "10"
+}
